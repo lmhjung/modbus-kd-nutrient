@@ -365,8 +365,6 @@ class Mbus_3288_Slave extends EventEmitter {
         // this.emit( 'TxRx', json );
     };
 
-
-
     /**
      *  ============================================================== update flow
      * 유량정리 
@@ -458,21 +456,27 @@ class Mbus_3288_Slave extends EventEmitter {
 
     // - 101    ~   121     (노드부착디바이스)
     writeReg_attachDevice (json) {
-        // console.log( 'get solar update ', json )
-        this.emit( 'mylog', json );
-        let _regAddress = 101;
-        vector.setRegister(_regAddress+0, json.value.ec[0]===1 ? 12 : 0 );       // EC1 센서 
-        vector.setRegister(_regAddress+1, json.value.ec[1]===1 ? 12 : 0 );       // EC2 센서 
-        vector.setRegister(_regAddress+2, json.value.ec[2]===1 ? 12 : 0 );       // EC3 센서 
-        vector.setRegister(_regAddress+3, json.value.ph[0]===1 ? 16 : 0 );       // PH1 센서 
-        vector.setRegister(_regAddress+4, json.value.ph[1]===1 ? 16 : 0 );       // PH2 센서 
-        vector.setRegister(_regAddress+5, json.value.ph[2]===1 ? 16 : 0 );       // PH3 센서 
-        vector.setRegister(_regAddress+6, json.value.solar[0]===1 ? 7 : 0 );    // 일사센서 
-        for(let i=0; i<14; i++) {
-            vector.setRegister( 108 + i, json.value.flow[i]===1 ? 5 : 0 );       // 전체 /  구역유량센서 
+        try {
+            // console.log( 'get solar update ', json )
+            this.emit( 'mylog', json );
+            let _regAddress = 101;
+            vector.setRegister(_regAddress+0, json.value.ec[0] );       // EC1 센서 
+            vector.setRegister(_regAddress+1, json.value.ec[1] );       // EC2 센서 
+            vector.setRegister(_regAddress+2, json.value.ec[2]);       // EC3 센서 
+            vector.setRegister(_regAddress+3, json.value.ph[0]);       // PH1 센서 
+            vector.setRegister(_regAddress+4, json.value.ph[1]);       // PH2 센서 
+            vector.setRegister(_regAddress+5, json.value.ph[2]);       // PH3 센서 
+            vector.setRegister(_regAddress+6, json.value.solar[0]);    // 일사센서 
+            for(let i=0; i<13; i++) {       // 전체유량 포함하면 12구역 + 총유량 = 13개 임
+                vector.setRegister( 108 + i, json.value.flow[i] );       // 전체 /  구역유량센서 
+            }
+            vector.setRegister(121, json.value.irr );    // 레벨3 양액기
+            console.log( '------- 부착센서 완료 -------' );
+        } 
+        catch (error) {
+            console.log( error )            
         }
-        vector.setRegister(121, json.value.irr  );    // 레벨3 양액기
-        console.log( '------- 부착센서 완료 -------' )
+
     };
     
 

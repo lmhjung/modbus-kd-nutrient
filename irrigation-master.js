@@ -123,7 +123,7 @@ let myDevice = {
         203 : 1,                // 초기화 상태에서 제어권은 1(로컬)로 되어야 함.
     },
 
-    sensor_val : {           // 양액기 노드 상태정보 B.3 상태(status) 코드
+    sensor_val : {              // 양액기 노드 상태정보 B.3 상태(status) 코드
         ec          : [0, 0, 0],
         ph          : [0, 0, 0],
         temp        : [0, 0, 0],
@@ -160,7 +160,7 @@ let myDevice = {
 
 console.log( '------------------ START ------------------' );
 console.log( '------------------ START ------------------' );
-setTimeout(() => {
+setTimeout( async ()  => {
     mbus_3288_slave.makeRegisterMap()       // 레지스터 초기화 
     console.log( '------------------ RUN ------------------' );
     console.log( '------------------ RUN ------------------' );
@@ -199,7 +199,7 @@ setTimeout(() => {
             r007    : KSX.Appendix_3288.A_1_1.SERIAL_NO,
         }
     }
-    mbus_3288_slave.writeReg_companyInfo(json)
+    await mbus_3288_slave.writeReg_companyInfo(json)
     console.log( '------- 컴퍼니 정보 업데이트 -------' )
 
 
@@ -207,18 +207,20 @@ setTimeout(() => {
     // ├──── 디바이스 부착 센서 업데이트
     // ├───────────────────────────────────────────────┘
     json = {
-        topic: 'devices',
-        no : 1,
-        value : {   // [ec1, ec2, ec3, ph1, ph2, ph3, solar1, flow0, flow1, flow2 ..... flow12]
-            ec : [12,0,0],          // ec 1개 1번에 부착, EC코드는 12
-            ph : [16,0,0],          // ph 1개 1번에 부착  PH코드는 16
-            solar : [7],            // 일사는 1개 부착 
-            flow : [5,5,5,5,5,5,5,5,5,5,5,5,5], // 13개(전체유량 포함)
-            irr : 204           // 201/202/203/204    레벨3 양액기
+        topic       : 'devices',
+        no          : 1,
+        value       : {   // [ec1, ec2, ec3, ph1, ph2, ph3, solar1, flow0, flow1, flow2 ..... flow12]
+            ec      : [12,0,0],          // ec 1개 1번에 부착, EC코드는 12
+            ph      : [16,0,0],          // ph 1개 1번에 부착  PH코드는 16
+            solar   : [7],            // 일사는 1개 부착 
+            flow    : [5,5,5,5,5,5,5,5,5,5,5,5,5], // 13개(전체유량 포함)
+            irr     : 204           // 201/202/203/204    레벨3 양액기
         }
     }
-    mbus_3288_slave.writeReg_attachDevice(json)
-    console.log( '------- 디바이스 부착정보 입데이트 -------' )
+    await mbus_3288_slave.writeReg_attachDevice(json);
+    console.log( holdingRegisters[101] )
+    console.log( '------- 디바이스 부착정보 입데이트 -------' );
+
 
 }, 100 );
 
@@ -483,6 +485,7 @@ let myCnt = 0;
     // mbus_3288_slave.writeReg_working(json);             // 양액기 운전상태 업데이트 
 
 
+
     myCnt++;
 }, 1 * 1000);
 
@@ -532,13 +535,14 @@ function System_Stop_From_3288( _json ) {
     
         default:
             break;
-    }
     
+        }
 
 
 
 
-    console.log( colors.cyan('get Running Message ', _json) );
+    
+        console.log( colors.cyan('get Running Message ', _json) );
 
 
 }

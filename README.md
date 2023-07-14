@@ -8,15 +8,15 @@ modbus KS X 3288
 ## <span style="color:black; background-color:#D8DF68">1. 폴더구조 및 사용법  </span>
 ```javascript
 "modbus-kd-nutrient"
-├─── index.js                       // 양액기 <> 3288 
-├─── irrigation-master.js           // 모드버스 슬레이브 양액기
-├─── src                            // 
-│     ├─── KSX_Define.js            // 표준문서의 도표를 JSON 오브젝트로 정리중 
-│     ├─── mbus_3288.alarm.js       // 사용안함 (to be...)
-│     ├─── mbus_3288.database.js    // 사용안함 (to be...)
-│     ├─── mbus_3288.main.js        // Wrapper module for "modbus-serial"
-│     ├─── mbus_3288.slave.js       // Modbus Event Module for 3288
-│
+   ├─── index.js                       // 양액기 <> 3288 
+   ├─── irrigation-master.js           // 모드버스 슬레이브 양액기
+   ├─── src                            // 
+   │     ├─── KSX_Define.js            // 표준문서의 도표를 JSON 오브젝트로 정리중 
+   │     ├─── mbus_3288.alarm.js       // 사용안함 (to be...)
+   │     ├─── mbus_3288.database.js    // 사용안함 (to be...)
+   │     ├─── mbus_3288.main.js        // Wrapper module for "modbus-serial"
+   │     ├─── mbus_3288.slave.js       // Modbus Event Module for 3288
+   │
 
 
 irrigation-master.js 
@@ -24,30 +24,8 @@ irrigation-master.js
 - 
 
 
-
-
-이하 내용은 수정중...
-이하 내용은 수정중...
-이하 내용은 수정중...
-
-이하 내용은 수정중...
-이하 내용은 수정중...
-이하 내용은 수정중...
-이하 내용은 수정중...
-이하 내용은 수정중...
-이하 내용은 수정중...
-이하 내용은 수정중...
-이하 내용은 수정중...
-이하 내용은 수정중...
-이하 내용은 수정중...
-
-
-
-
-
 // 1번부터 8개의 레지스터 요청 
 (REQ) ⫸ 31 03 0001 0008 CRC ↲
-
      // 복합노드          : 3   (3267에서 양액기는 복합노드로 정의)
      // 양액기레벨        : 4   (레벨3양액기)
      // 프로토콜 버전     : 20  (고정)
@@ -56,6 +34,45 @@ irrigation-master.js
 (RCV) ⫷ 31 03 00 00 00 00 0003 0004 0014 0015 27100000 CRC ↲
       - 제품의 시리얼 넘버를 고정해 버리면 
 ```
+
+## <span style="color:black; background-color:#D8DF68">2. 양액기 읽기  </span>
+> - 슬레이브주소(1B)  / 기능코드(1B)  / 시작주소(2B)  / 레지스트 수(2B) / CRC(2B)
+>``` javascript
+>- 사용자정의
+>- 1~8 (기관코드, 회사코드, 제품타입, 제품코드, 프로토콜버전, 채널수,시리얼번호)
+>     (온실통합제어기)  TX : 01 03 00 01 00 08 15 CC
+>     (양액기)          RX : 01 03 10 00 00 00 00 00 03 00 04 00 14 00 15 00 00 00 00 80 1F
+>
+>- 101~121 (노드부착디바이스)
+> TX : 01 03 00 65 00 15 94 1A
+> RX : 01 03 2A 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 CC 2E 8D
+
+
+
+>- 201~203 (양액기노드상태)
+>- 204~263(센서상태)
+>- 401~406(양액기상태)
+>- 501~513(양액기노드제어)
+
+>```
+
+
+
+
+## <span style="color:black; background-color:#D8DF68">2. 양액기 읽기  </span>
+```javascript
+Read Modbus (양액기)
+- 사용자정의
+- 1~8 (기관코드, 회사코드, 제품타입, 제품코드, 프로토콜버전, 채널수,시리얼번호)
+- 101~121 (노드부착디바이스)
+- 201~203 (양액기노드상태)
+- 204~263(센서상태)
+- 401~406(양액기상태)
+- 501~513(양액기노드제어)
+
+```
+
+
 
 
 ## [Cloned repository](https://github.com/aditya0929/reactBoard)
