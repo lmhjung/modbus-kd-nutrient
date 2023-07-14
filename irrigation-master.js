@@ -18,7 +18,7 @@ setInterval(() => {
 
 
 
-const KSX = require('./KSX_Define.js');
+const KSX = require('./src/KSX_Define.js');
 
 
 
@@ -30,9 +30,9 @@ const KSX = require('./KSX_Define.js');
 const colors                = require('colors');
 const moment                = require('moment');
 
-const Mbus_3288_Slave       = require("../index.js");
-const Mbus_3288_Alarm       = require("../src/mbus_3288_alarm.js");
-const Mbus_3288_Database    = require("../src/mbus_3288_database.js");
+const Mbus_3288_Slave       = require("./index.js");
+const Mbus_3288_Alarm       = require("./src/mbus_3288_alarm.js");
+const Mbus_3288_Database    = require("./src/mbus_3288_database.js");
 // const Mbus_3288_Httppost    = require("../src/mbus_3288_httppost.js"); // to be...
 
 

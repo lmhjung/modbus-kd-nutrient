@@ -5,9 +5,13 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon ./examples/irrigation-master.js",
+    "start": "nodemon ./irrigation-master.js",
     "run": "set DEBUG=modbus-serial && node index.js"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lmhjung/modbus-kd-nutrient.git"
+  },  
   "keywords": [],
   "author": "",
   "license": "ISC",
