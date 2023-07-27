@@ -1,6 +1,6 @@
 {
   "name": "modbus-kd-nutrient",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "koreadigital ksx3288",
   "main": "index.js",
   "scripts": {
