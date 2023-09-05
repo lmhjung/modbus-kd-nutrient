@@ -18,11 +18,6 @@ setInterval(() => {
 
 
 
-const KSX = require('./src/KSX_Define.js');
-
-
-
-
 
 
 
@@ -41,6 +36,8 @@ const mbus_3288_slave       = new Mbus_3288_Slave( 'COM6', 115200, 1, 3 );
 const mbus_3288_alarm       = new Mbus_3288_Alarm();
 const mbus_3288_database    = new Mbus_3288_Database();
 
+
+const KSX = require('./src/KSX_Define.js');
 
 
 mbus_3288_slave.on("buy", (email, price, timestamp) => {

@@ -24,9 +24,6 @@ const inputRegisters = {};
 const discreteInputs = {};
 
 
-
-
-
 const vector = {
     getInputRegister: function(addr) {
         return inputRegisters[addr];
@@ -112,7 +109,7 @@ const vector = {
 
 
 // https://www.tahapaksu.com/crc/
-
+// https://www.tahapaksu.com/crc/
 setInterval(() => {
     /**
         // 01 10 01 F8 00 09 12 00 01 00 02 00 03 00 04 00 05 00 06 00 07 00 08 00 09 5B 2B
@@ -206,23 +203,41 @@ class Mbus_3288_Slave extends EventEmitter {
         let self = this;
         this.supply = supply;
         this.name = 'packet';
-
-        this.serverSerial = new ModbusRTU.ServerSerial(
-            vector,
-            {
-                port: _port || 'COM6',
-                baudRate: _rate || 115200,
-                debug: true,
-                unitID: _id || 1,
-                enron: false,
-                enronTables: {
-                    booleanRange: [1001, 1999],
-                    shortRange: [3001, 3999],
-                    longRange: [5001, 5999],
-                    floatRange: [7001, 7999]
+        
+        try {
+            this.serverSerial = new ModbusRTU.ServerSerial(
+                vector,
+                {
+                    port: _port || 'COM6',
+                    baudRate: _rate || 115200,
+                    debug: true,
+                    unitID: _id || 1,
+                    enron: false,
+                    enronTables: {
+                        booleanRange: [1001, 1999],
+                        shortRange: [3001, 3999],
+                        longRange: [5001, 5999],
+                        floatRange: [7001, 7999]
+                    }
                 }
-            }
-        );
+            );
+        } 
+        catch (error) {
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+            console.log( 'serial error' )            
+        }
+
 
         this.serverSerial.on("error", function(err) {
             // Handle socket error if needed, can be ignored
@@ -254,23 +269,37 @@ class Mbus_3288_Slave extends EventEmitter {
         this.serverSerial.on("rxData", async function(data) {
             try {
                 let bufArr = [...data];
+
+                self.emit( 'TxRx', {msg:'rxBuffer', data: data } );
+
                 // 01 10 01 F5 00 03 06 00 02 00 65 00 02 1F B1
                 if( bufArr[1] === 16 ) {    // if( bufArr[1]===6 || bufArr[1]===16 ) {
-                    console.log( colors.bgBrightCyan( `get write message OPID=${data.readUInt16BE(2, 2)}` ) );
+                    console.log( colors.bgBrightCyan( `get write message CMD=${data.readUInt16BE(2, 2)}` ) );
                     let cmd_no = data.readUInt16BE(2, 2);
 
                     if( cmd_no === 501 || cmd_no === 504 ) {
+                        console.log( `get cmd_no =${cmd_no}` )
                     }
                     else {
                         this.emit( 'mylog', {msg:'log', data: 'we need 501 or 504' } );
                         return;
                     }
 
-                    // OPID 동일한지 체크
+                    // OPID 가 변경된 상황인지 체크 즉, 명령이 변경되었음을 확인.
                     if(holdingRegisters[202] !== data.readUInt16BE(9, 2) ) {
                         switch ( cmd_no ) {
+
+                            /**
+                             * 제어권 변경을 위해 
+                             * 501 주소에 2,101,2 << 이렇게 넣으면 
+                             * 01 10 01 F5 00 03 06 00 02 00 65 00 02 1F B1  << 15 byte
+                             * 
+                             */
+                            // 제어권 변경을 위해 
+                            // 
+                            
                             case 501:
-                                vector.setRegister( 501, data.readUInt16BE(7, 2))
+                                vector.setRegister(501, data.readUInt16BE(7, 2))
                                 vector.setRegister(502, data.readUInt16BE(9, 2))
                                 vector.setRegister(503, data.readUInt16BE(11, 2))
 
@@ -295,14 +324,12 @@ class Mbus_3288_Slave extends EventEmitter {
                                     // 401  : 1회관수
                                     // 402  : AREA_ON
                                     // 403  : PARAM_ON
-                                    self.emit( 'command_form_master', {msg: 504, data: data } );
+                                    self.emit( 'command_form_master', {msg: data.readUInt16BE(7, 2), data: data } );
                                 }
                                 else {
                                     console.log( '   '.bgMagenta, '제어권이 REMOTE 상태가 아닙니다.'.magenta )
                                 }
                                 break;
-                        
-
 
                             default:
                                 break;
@@ -313,8 +340,8 @@ class Mbus_3288_Slave extends EventEmitter {
                         console.log( '   '.bgMagenta, 'OPID가 동일하여 명령이 취소됩니다.'.magenta )
                     }
                 }
-                // console.log( 'RX:', data )
-                self.emit( 'TxRx', {msg:'rxBuffer', data: data } );
+                // // console.log( 'RX:', data )
+                // self.emit( 'TxRx', {msg:'rxBuffer', data: data } );
             } 
             catch (error) {
                 self.emit( 'myerror', {msg:'error', data: error } );
@@ -341,6 +368,8 @@ class Mbus_3288_Slave extends EventEmitter {
         });
 
     }
+
+
 
     buy(email, price) {
         if (this.supply > 0) {
