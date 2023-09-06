@@ -209,7 +209,7 @@ class Mbus_3288_Slave extends EventEmitter {
                 vector,
                 {
                     port: _port || 'COM6',
-                    baudRate: _rate || 115200,
+                    baudRate: _rate || 9600,
                     debug: true,
                     unitID: _id || 1,
                     enron: false,
@@ -270,6 +270,8 @@ class Mbus_3288_Slave extends EventEmitter {
             try {
                 let bufArr = [...data];
 
+
+                console.log( data.toString() )
                 self.emit( 'TxRx', {msg:'rxBuffer', data: data } );
 
                 // 01 10 01 F5 00 03 06 00 02 00 65 00 02 1F B1

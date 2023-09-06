@@ -32,7 +32,7 @@ const Mbus_3288_Database    = require("./src/mbus_3288_database.js");
 
 
 
-const mbus_3288_slave       = new Mbus_3288_Slave( 'COM6', 115200, 1, 3 );
+const mbus_3288_slave       = new Mbus_3288_Slave( 'COM6', 9600, 1, 3 );
 const mbus_3288_alarm       = new Mbus_3288_Alarm();
 const mbus_3288_database    = new Mbus_3288_Database();
 
