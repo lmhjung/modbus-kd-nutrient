@@ -270,9 +270,7 @@ class Mbus_3288_Slave extends EventEmitter {
             try {
                 let bufArr = [...data];
 
-
-                console.log( data.toString() )
-                self.emit( 'TxRx', {msg:'rxBuffer', data: data } );
+                self.emit( 'TxRx', {msg:'3288 rxBuffer', data: data } );
 
                 // 01 10 01 F5 00 03 06 00 02 00 65 00 02 1F B1
                 if( bufArr[1] === 16 ) {    // if( bufArr[1]===6 || bufArr[1]===16 ) {
@@ -356,7 +354,7 @@ class Mbus_3288_Slave extends EventEmitter {
         // ├────   txData                                  │ 
         // ├───────────────────────────────────────────────┘
         this.serverSerial.on("txData", function(data) {
-            self.emit( 'TxRx', {msg:'txBuffer', data: data} );
+            self.emit( 'TxRx', {msg:'3288 txBuffer', data: data} );
             // console.log( 'TX:', [...data] )
             // console.log( 'TX:', data )
         });
