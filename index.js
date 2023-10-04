@@ -277,15 +277,18 @@ class Mbus_3288_Slave extends EventEmitter {
 
                 self.emit( 'TxRx', {msg:'3288 rxBuffer', data: data } );
 
-                if( holdingRegisters[203] === 3 ) {
-                    this.emit( 'myMessage', {msg:'log', data: '명령취소(수동모드)' } );
-                    return;
-                }
 
                 // 01 10 01 F5 00 03 06 00 02 00 65 00 02 1F B1
                 if( bufArr[1] === 16 ) {    // if( bufArr[1]===6 || bufArr[1]===16 ) {
                     console.log( colors.bgBrightCyan( `get write message CMD=${data.readUInt16BE(2, 2)}` ) );
                     let cmd_no = data.readUInt16BE(2, 2);
+
+
+                    if( holdingRegisters[203] === 3 ) {
+                        this.emit( 'myMessage', {msg:'log', data: '명령취소(수동모드)' } );
+                        return;
+                    }
+    
 
                     if( cmd_no === 501 || cmd_no === 504 ) {
                         console.log( `get cmd_no =${cmd_no}` )

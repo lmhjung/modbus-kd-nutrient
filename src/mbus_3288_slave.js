@@ -296,7 +296,6 @@ class ServerSerial extends EventEmitter {
 
             if( holdingRegisters[203] === 3 ) {         // 제어권이 수동이면 제어권을 획득할 수 없다. 
                 console.error( '현재 수동제어(3) 상황입니다.'.bgMagenta );
-                modbus.emit("rxData", recvBuffer);
                 return;
             }
 
