@@ -296,15 +296,12 @@ class ServerSerial extends EventEmitter {
 
             if( holdingRegisters[203] === 3 ) {         // 제어권이 수동이면 제어권을 획득할 수 없다. 
                 console.error( '현재 수동제어(3) 상황입니다.'.bgMagenta );
-                return;
+                // return;
             }
 
 
             modbus.emit("rxData", recvBuffer);
             // console.log( recvBuffer.readUInt16BE(2, 2), holdingRegisters[502] );
-
-
-
 
             while (recvBuffer.length > ADDR_LEN) {
                 const requestBuffer = Buffer.alloc(recvBuffer.length);
