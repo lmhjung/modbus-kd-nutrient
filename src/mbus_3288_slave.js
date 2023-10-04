@@ -123,83 +123,88 @@ function _callbackFactory(unitID, functionCode, sockWriter) {
  * @private
  */
 function _parseModbusBuffer(requestBuffer, vector, serverUnitID, sockWriter, options) {
-    // Check requestBuffer length
-    if (!requestBuffer || requestBuffer.length < ADDR_LEN) {
-        modbusSerialDebug("wrong size of request Buffer " + requestBuffer.length);
-        return;
-    }
-
-    const unitID = requestBuffer[0];
-    let functionCode = requestBuffer[1];
-    const crc = requestBuffer[requestBuffer.length - 2] + requestBuffer[requestBuffer.length - 1] * 0x100;
-
-    // if crc is bad, ignore message
-    if (crc !== crc16(requestBuffer.slice(0, -2))) {
-        modbusSerialDebug("wrong CRC of request Buffer");
-        return;
-    }
-
-    // if crc is bad, ignore message
-    if (serverUnitID !== 255 && serverUnitID !== unitID) {
-        modbusSerialDebug("wrong unitID");
-        return;
-    }
-
-    modbusSerialDebug("request for function code " + functionCode);
-    const cb = _callbackFactory(unitID, functionCode, sockWriter);
-
-    switch (parseInt(functionCode)) {
-        case 1:
-        case 2:
-            handlers.readCoilsOrInputDiscretes(requestBuffer, vector, unitID, cb, functionCode);
-            break;
-        case 3:
-            if (options && options.enron) {
-                handlers.readMultipleRegistersEnron(requestBuffer, vector, unitID, options.enronTables, cb);
-            } else {
-                handlers.readMultipleRegisters(requestBuffer, vector, unitID, cb);
-            }
-            break;
-        case 4:
-            handlers.readInputRegisters(requestBuffer, vector, unitID, cb);
-            break;
-        case 5:
-            handlers.writeCoil(requestBuffer, vector, unitID, cb);
-            break;
-        case 6:
-            if (options && options.enron) {
-                handlers.writeSingleRegisterEnron(requestBuffer, vector, unitID, options.enronTables, cb);
-            } else {
-                handlers.writeSingleRegister(requestBuffer, vector, unitID, cb);
-            }
-            break;
-        case 15:
-            handlers.forceMultipleCoils(requestBuffer, vector, unitID, cb);
-            break;
-        case 16:
-            handlers.writeMultipleRegisters(requestBuffer, vector, unitID, cb);
-            break;
-        case 17:
-            handlers.reportServerID(requestBuffer, vector, unitID, cb);
-            break;
-        case 43:
-            handlers.handleMEI(requestBuffer, vector, unitID, cb);
-            break;
-        default: {
-            const errorCode = 0x01; // illegal function
-
-            // set an error response
-            functionCode = parseInt(functionCode) | 0x80;
-            const responseBuffer = Buffer.alloc(3 + 2);
-            responseBuffer.writeUInt8(errorCode, 2);
-
-            modbusSerialDebug({
-                error: "Illegal function",
-                functionCode: functionCode
-            });
-
-            cb({ modbusErrorCode: errorCode }, responseBuffer);
+    try {
+        // Check requestBuffer length
+        if (!requestBuffer || requestBuffer.length < ADDR_LEN) {
+            modbusSerialDebug("wrong size of request Buffer " + requestBuffer.length);
+            return;
         }
+
+        const unitID = requestBuffer[0];
+        let functionCode = requestBuffer[1];
+        const crc = requestBuffer[requestBuffer.length - 2] + requestBuffer[requestBuffer.length - 1] * 0x100;
+
+        // if crc is bad, ignore message
+        if (crc !== crc16(requestBuffer.slice(0, -2))) {
+            modbusSerialDebug("wrong CRC of request Buffer");
+            return;
+        }
+
+        // if crc is bad, ignore message
+        if (serverUnitID !== 255 && serverUnitID !== unitID) {
+            modbusSerialDebug("wrong unitID");
+            return;
+        }
+
+        modbusSerialDebug("request for function code " + functionCode);
+        const cb = _callbackFactory(unitID, functionCode, sockWriter);
+
+        switch (parseInt(functionCode)) {
+            case 1:
+            case 2:
+                handlers.readCoilsOrInputDiscretes(requestBuffer, vector, unitID, cb, functionCode);
+                break;
+            case 3:
+                if (options && options.enron) {
+                    handlers.readMultipleRegistersEnron(requestBuffer, vector, unitID, options.enronTables, cb);
+                } else {
+                    handlers.readMultipleRegisters(requestBuffer, vector, unitID, cb);
+                }
+                break;
+            case 4:
+                handlers.readInputRegisters(requestBuffer, vector, unitID, cb);
+                break;
+            case 5:
+                handlers.writeCoil(requestBuffer, vector, unitID, cb);
+                break;
+            case 6:
+                if (options && options.enron) {
+                    handlers.writeSingleRegisterEnron(requestBuffer, vector, unitID, options.enronTables, cb);
+                } else {
+                    handlers.writeSingleRegister(requestBuffer, vector, unitID, cb);
+                }
+                break;
+            case 15:
+                handlers.forceMultipleCoils(requestBuffer, vector, unitID, cb);
+                break;
+            case 16:
+                handlers.writeMultipleRegisters(requestBuffer, vector, unitID, cb);
+                break;
+            case 17:
+                handlers.reportServerID(requestBuffer, vector, unitID, cb);
+                break;
+            case 43:
+                handlers.handleMEI(requestBuffer, vector, unitID, cb);
+                break;
+            default: {
+                const errorCode = 0x01; // illegal function
+
+                // set an error response
+                functionCode = parseInt(functionCode) | 0x80;
+                const responseBuffer = Buffer.alloc(3 + 2);
+                responseBuffer.writeUInt8(errorCode, 2);
+
+                modbusSerialDebug({
+                    error: "Illegal function",
+                    functionCode: functionCode
+                });
+
+                cb({ modbusErrorCode: errorCode }, responseBuffer);
+            }
+        }        
+    } 
+    catch (error) {
+        
     }
 }
 
@@ -291,6 +296,7 @@ class ServerSerial extends EventEmitter {
 
             if( holdingRegisters[203] === 3 ) {         // 제어권이 수동이면 제어권을 획득할 수 없다. 
                 console.error( '현재 수동제어(3) 상황입니다.'.bgMagenta );
+                modbus.emit("rxData", recvBuffer);
                 return;
             }
 

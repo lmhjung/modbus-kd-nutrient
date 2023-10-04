@@ -240,9 +240,14 @@ class Mbus_3288_Slave extends EventEmitter {
 
 
         this.serverSerial.on("error", function(err) {
-            // Handle socket error if needed, can be ignored
-            console.error(err);
-            self.emit( 'myerror', {msg:'error', data: err } );
+            try {
+                // Handle socket error if needed, can be ignored
+                console.error(err);
+                self.emit( 'myerror', {msg:'error', data: err } );
+            } 
+            catch (error) {
+                
+            }
         });
         
         this.serverSerial.on("initialized", function() {
@@ -272,6 +277,11 @@ class Mbus_3288_Slave extends EventEmitter {
 
                 self.emit( 'TxRx', {msg:'3288 rxBuffer', data: data } );
 
+                if( holdingRegisters[203] === 3 ) {
+                    this.emit( 'myMessage', {msg:'log', data: '명령취소(수동모드)' } );
+                    return;
+                }
+
                 // 01 10 01 F5 00 03 06 00 02 00 65 00 02 1F B1
                 if( bufArr[1] === 16 ) {    // if( bufArr[1]===6 || bufArr[1]===16 ) {
                     console.log( colors.bgBrightCyan( `get write message CMD=${data.readUInt16BE(2, 2)}` ) );
@@ -299,6 +309,11 @@ class Mbus_3288_Slave extends EventEmitter {
                             // 
                             
                             case 501:
+
+                                if( holdingRegisters[203] === 1 && data.readUInt16BE(11, 2) === 2 ) {
+                                    self.emit( 'command_form_master_ctlChange', {msg: 'cmd changed'} );
+                                }
+
                                 vector.setRegister(501, data.readUInt16BE(7, 2))
                                 vector.setRegister(502, data.readUInt16BE(9, 2))
                                 vector.setRegister(503, data.readUInt16BE(11, 2))
@@ -306,7 +321,10 @@ class Mbus_3288_Slave extends EventEmitter {
                                 vector.setRegister(201, 0)
                                 vector.setRegister(202, data.readUInt16BE(9, 2))
                                 vector.setRegister(203, data.readUInt16BE(11, 2))
-                                self.emit( 'command_form_master', {msg: 501, data: data } );
+                                self.emit( 'command_form_master', {msg: 501, data: data} );
+
+
+
                                 break;
                         
                             case 504:
