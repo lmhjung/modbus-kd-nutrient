@@ -299,9 +299,11 @@ class Mbus_3288_Slave extends EventEmitter {
                     }
 
                     // OPID 가 변경된 상황인지 체크 즉, 명령이 변경되었음을 확인.
-                    if(holdingRegisters[202] !== data.readUInt16BE(9, 2) ) {
-                        switch ( cmd_no ) {
+                    // 항상 높은값인지 체크
+                    // if(holdingRegisters[202] !== data.readUInt16BE(9, 2) ) {
+                    if(holdingRegisters[202] < data.readUInt16BE(9, 2) ) {
 
+                        switch ( cmd_no ) {
                             /**
                              * 제어권 변경을 위해 
                              * 501 주소에 2,101,2 << 이렇게 넣으면 
