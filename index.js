@@ -267,7 +267,6 @@ class Mbus_3288_Slave extends EventEmitter {
             console.log("opened");
         });    
 
-
         // ├───────────────────────────────────────────────┐ 
         // ├────   rxData                                  │
         // ├───────────────────────────────────────────────┘
@@ -275,20 +274,19 @@ class Mbus_3288_Slave extends EventEmitter {
             try {
                 let bufArr = [...data];
 
-                self.emit( 'TxRx', {msg:'3288 rxBuffer', data: data } );
-
+                self.emit( 'TxRx', {msg:'3288 rxBuffer', data: data } );        // 그냥 로그보기용 
 
                 // 01 10 01 F5 00 03 06 00 02 00 65 00 02 1F B1
                 if( bufArr[1] === 16 ) {    // if( bufArr[1]===6 || bufArr[1]===16 ) {
                     console.log( colors.bgBrightCyan( `get write message CMD=${data.readUInt16BE(2, 2)}` ) );
                     let cmd_no = data.readUInt16BE(2, 2);
 
-
                     if( holdingRegisters[203] === 3 ) {
+                        // must
+                        holdingRegisters[503] = 3
                         this.emit( 'myMessage', {msg:'log', data: '명령취소(수동모드)' } );
                         return;
                     }
-    
 
                     if( cmd_no === 501 || cmd_no === 504 ) {
                         console.log( `get cmd_no =${cmd_no}` )
@@ -326,9 +324,8 @@ class Mbus_3288_Slave extends EventEmitter {
                                 vector.setRegister(201, 0)
                                 vector.setRegister(202, data.readUInt16BE(9, 2))
                                 vector.setRegister(203, data.readUInt16BE(11, 2))
+
                                 self.emit( 'command_form_master', {msg: 501, data: data} );
-
-
 
                                 break;
                         
